@@ -58,6 +58,40 @@ type Agent struct {
 }
 
 // TODO: Candidate should define request/response DTOs clearly.
+
+// Job DTOs
+type CreateJobRequest struct {
+	Name           string         `json:"name"`
+	Type           JobType        `json:"type"`
+	Payload        map[string]any `json:"payload"`
+	MaxRetries     int            `json:"max_retries"`
+	TimeoutSeconds int            `json:"timeout_seconds"`
+}
+
+type SubmitJobResultRequest struct {
+	Status JobStatus      `json:"status"`
+	Logs   []string       `json:"logs"`
+	Result map[string]any `json:"result,omitempty"`
+	Error  string         `json:"error,omitempty"`
+}
+
+// Agent DTOs
+type RegisterAgentRequest struct {
+	Hostname     string    `json:"hostname"`
+	OS           string    `json:"os"`
+	Arch         string    `json:"arch"`
+	Version      string    `json:"version"`
+	Capabilities []JobType `json:"capabilities"`
+}
+
+// Not sure
+type ErrorResponse struct {
+	Message string `json:"message"`
+}
+type NextJobResponse struct {
+	Job Job `json:"job"`
+}
+
 // Suggested DTOs:
 //   CreateJobRequest
 //   RegisterAgentRequest

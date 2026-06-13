@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"taskbridge/internal/api"
+	"taskbridge/internal/store"
 )
 
 func main() {
 	addr := flag.String("addr", ":8080", "server listen address")
 	flag.Parse()
 
-	mux := http.NewServeMux()
+	store := store.NewMemoryStore()
+	server := api.NewServer(store)
 
 	// TODO: Candidate should move route registration into internal/api.
 	// Required routes:
@@ -24,11 +27,7 @@ func main() {
 	//   POST /agents/{agentId}/heartbeat
 	//   POST /agents/{agentId}/next-job
 	//   POST /jobs/{jobId}/result
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"status":"ok","service":"taskbridge-server"}`))
-	})
 
 	fmt.Printf("TaskBridge server listening on %s\n", *addr)
-	log.Fatal(http.ListenAndServe(*addr, mux))
+	log.Fatal(http.ListenAndServe(*addr, server.Routes()))
 }
