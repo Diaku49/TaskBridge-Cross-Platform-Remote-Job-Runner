@@ -1,6 +1,11 @@
 package api
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
+
+var LastSeenThreshold = 30 * time.Second
 
 func (s *server) RegisterAgent(w http.ResponseWriter, r *http.Request) {}
 

@@ -77,6 +77,7 @@ type SubmitJobResultRequest struct {
 
 // Agent DTOs
 type RegisterAgentRequest struct {
+	ID           string    `json:"id"`
 	Hostname     string    `json:"hostname"`
 	OS           string    `json:"os"`
 	Arch         string    `json:"arch"`

@@ -2,6 +2,8 @@ package executor
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"taskbridge/internal/model"
 )
 
@@ -35,6 +37,15 @@ func (r *Registry) Register(ex Executor) {
 func (r *Registry) Get(t model.JobType) (Executor, bool) {
 	ex, ok := r.executors[t]
 	return ex, ok
+}
+
+func DecodePayload(payload map[string]any, dst any) error {
+	jsonByte, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("marshal failed, err:%v", err)
+	}
+
+	return json.Unmarshal(jsonByte, dst)
 }
 
 // TODO: Candidate should implement safe executors:

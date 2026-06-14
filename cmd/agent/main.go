@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"taskbridge/internal/agent"
 	"time"
 )
 
@@ -12,6 +13,13 @@ func main() {
 	capabilities := flag.String("capabilities", "http_check,tcp_check,file_exists", "comma-separated job capabilities")
 	pollInterval := flag.Duration("poll-interval", 3*time.Second, "job polling interval")
 	flag.Parse()
+
+	ac := agent.NewAgentClient(*agentID, *serverURL, *capabilities, *pollInterval)
+
+	if err := ac.Register(); err != nil {
+		fmt.Printf("Failed to register agent: %v\n", err)
+		return
+	}
 
 	// TODO: Candidate should implement:
 	//   1. Register agent with server
