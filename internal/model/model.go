@@ -57,6 +57,12 @@ type Agent struct {
 	Status       string    `json:"status"`
 }
 
+var (
+	OnlineAgent       = "online"
+	OfflineAgent      = "offline"
+	AgentOfflineAfter = 30 * time.Second
+)
+
 // TODO: Candidate should define request/response DTOs clearly.
 
 // Job DTOs

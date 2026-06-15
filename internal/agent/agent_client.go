@@ -21,15 +21,6 @@ type AgentClient struct {
 	HTTPClient       *http.Client
 }
 
-var validJobTypes = map[model.JobType]struct{}{
-	model.JobHTTPCheck:  {},
-	model.JobTCPCheck:   {},
-	model.JobFileExists: {},
-	model.JobChecksum:   {},
-	model.JobWriteFile:  {},
-	model.JobWait:       {},
-}
-
 func NewAgentClient(agentId, serverURL, capabilities string, pollInterval time.Duration) *AgentClient {
 	caps := parseCapabilities(capabilities)
 	hostname, err := os.Hostname()

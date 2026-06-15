@@ -62,6 +62,23 @@ func (s *server) GetJob(w http.ResponseWriter, r *http.Request) {
 	HTTPResponse(w, http.StatusOK, job)
 }
 
-func (s *server) CancelJob(w http.ResponseWriter, r *http.Request) {}
+func (s *server) SubmitJobResult(w http.ResponseWriter, r *http.Request) {
+	jobId := r.PathValue("jobsId")
+	var req model.SubmitJobResultRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		HTTPError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	defer r.Body.Close()
 
-func (s *server) SubmitJobResult(w http.ResponseWriter, r *http.Request) {}
+	if err := s.st.CompleteJob(jobId, req.Status, req.Logs, req.Result, req.Error); err != nil {
+		HTTPError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	HTTPResponse(w, http.StatusOK, map[string]any{
+		"message": "job result submitted",
+	})
+}
+
+func (s *server) CancelJob(w http.ResponseWriter, r *http.Request) {}

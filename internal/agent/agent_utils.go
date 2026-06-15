@@ -11,6 +11,14 @@ import (
 )
 
 var heartbeatInterval = 10 * time.Second
+var validJobTypes = map[model.JobType]struct{}{
+	model.JobHTTPCheck:  {},
+	model.JobTCPCheck:   {},
+	model.JobFileExists: {},
+	model.JobChecksum:   {},
+	model.JobWriteFile:  {},
+	model.JobWait:       {},
+}
 
 func HeartbeatLoop(ac *AgentClient, ctx context.Context) {
 	ticker := time.NewTicker(heartbeatInterval)
@@ -35,16 +43,16 @@ func NewRegistry(capabilities []model.JobType) *executor.Registry {
 		switch cap {
 		case model.JobHTTPCheck:
 			registry.Register(executor.NewHTTPCheckExecutor(&http.Client{}))
-			// case model.JobTCPCheck:
-			// 	registry.Register(&executor.TCPCheckExecutor{})
-			// case model.JobFileExists:
-			// 	registry.Register(&executor.FileExistsExecutor{})
-			// case model.JobChecksum:
-			// 	registry.Register(&executor.ChecksumExecutor{})
-			// case model.JobWriteFile:
-			// 	registry.Register(&executor.WriteFileExecutor{})
-			// case model.JobWait:
-			// 	registry.Register(&executor.WaitExecutor{})
+		case model.JobTCPCheck:
+			registry.Register(executor.NewTcpCheckExecutor())
+		case model.JobFileExists:
+			registry.Register(executor.NewFileExistsExecutor())
+		case model.JobChecksum:
+			registry.Register(executor.NewChecksumExecutor())
+		case model.JobWriteFile:
+			registry.Register(executor.NewWriteFileExecutor())
+		case model.JobWait:
+			registry.Register(executor.NewWaitExecutor())
 		}
 	}
 	return registry
