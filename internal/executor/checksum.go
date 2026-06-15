@@ -7,6 +7,11 @@ import (
 
 type ChecksumExecutor struct{}
 
+type ChecksumPayload struct {
+	Path      string `json:"path"`
+	Algorithm string `json:"algorithm,omitempty"`
+}
+
 func NewChecksumExecutor() *ChecksumExecutor {
 	return &ChecksumExecutor{}
 }
