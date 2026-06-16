@@ -1,0 +1,15 @@
+{
+  "id": "agent-dev-1",
+  "hostname": "local-dev",
+  "os": "darwin",
+  "arch": "arm64",
+  "version": "dev",
+  "capabilities": [
+    "http_check",
+    "tcp_check",
+    "file_exists",
+    "checksum",
+    "write_file",
+    "wait"
+  ]
+}

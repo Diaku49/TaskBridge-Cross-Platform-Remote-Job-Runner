@@ -67,15 +67,15 @@ var (
 
 // Job DTOs
 type CreateJobRequest struct {
-	Name           string         `json:"name"`
-	Type           JobType        `json:"type"`
-	Payload        map[string]any `json:"payload"`
-	MaxRetries     int            `json:"max_retries"`
-	TimeoutSeconds int            `json:"timeout_seconds"`
+	Name           string         `json:"name" validate:"required,notblank"`
+	Type           JobType        `json:"type" validate:"required,oneof=http_check tcp_check file_exists checksum write_file wait"`
+	Payload        map[string]any `json:"payload" validate:"required"`
+	MaxRetries     int            `json:"max_retries" validate:"gte=0"`
+	TimeoutSeconds int            `json:"timeout_seconds" validate:"gte=0"`
 }
 
 type SubmitJobResultRequest struct {
-	Status JobStatus      `json:"status"`
+	Status JobStatus      `json:"status" validate:"required,oneof=SUCCESS FAILED"`
 	Logs   []string       `json:"logs"`
 	Result map[string]any `json:"result,omitempty"`
 	Error  string         `json:"error,omitempty"`
@@ -83,12 +83,12 @@ type SubmitJobResultRequest struct {
 
 // Agent DTOs
 type RegisterAgentRequest struct {
-	ID           string    `json:"id"`
-	Hostname     string    `json:"hostname"`
-	OS           string    `json:"os"`
-	Arch         string    `json:"arch"`
-	Version      string    `json:"version"`
-	Capabilities []JobType `json:"capabilities"`
+	ID           string    `json:"id" validate:"required,notblank"`
+	Hostname     string    `json:"hostname" validate:"required,notblank"`
+	OS           string    `json:"os" validate:"required,notblank"`
+	Arch         string    `json:"arch" validate:"required,notblank"`
+	Version      string    `json:"version" validate:"required,notblank"`
+	Capabilities []JobType `json:"capabilities" validate:"required,min=1,dive,oneof=http_check tcp_check file_exists checksum write_file wait"`
 }
 
 // Not sure

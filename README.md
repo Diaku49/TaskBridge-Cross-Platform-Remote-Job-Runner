@@ -47,6 +47,10 @@ curl http://localhost:8080/health
 go run ./cmd/agent --server http://localhost:8080 --id agent-dev-1
 ```
 
+## API examples
+
+See `docs/API_EXAMPLES.md` for curl commands and sample payload files in `examples/`.
+
 ## Suggested implementation order
 
 1. Implement API handlers and request DTOs.

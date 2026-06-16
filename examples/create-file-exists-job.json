@@ -1,0 +1,9 @@
+{
+  "name": "check-demo-input-file",
+  "type": "file_exists",
+  "payload": {
+    "path": "/tmp/taskbridge-demo/input.txt"
+  },
+  "timeout_seconds": 10,
+  "max_retries": 0
+}

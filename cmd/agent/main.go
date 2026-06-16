@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"taskbridge/internal/agent"
@@ -21,16 +22,11 @@ func main() {
 		return
 	}
 
-	// TODO: Candidate should implement:
-	//   1. Register agent with server
-	//   2. Send periodic heartbeat
-	//   3. Poll server for next job
-	//   4. Execute job using internal/executor
-	//   5. Report logs/result back to server
-
 	fmt.Println("TaskBridge agent starter")
 	fmt.Println("server:", *serverURL)
 	fmt.Println("agent_id:", *agentID)
 	fmt.Println("capabilities:", *capabilities)
 	fmt.Println("poll_interval:", *pollInterval)
+
+	ac.Start(context.Background())
 }

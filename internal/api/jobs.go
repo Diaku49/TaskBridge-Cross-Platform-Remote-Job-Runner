@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 	"taskbridge/internal/model"
 )
@@ -12,11 +11,10 @@ var (
 
 func (s *server) CreateJob(w http.ResponseWriter, r *http.Request) {
 	var req model.CreateJobRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		HTTPError(w, http.StatusBadRequest, "invalid request body")
+	if errMsg := decodeAndValidateRequest(r, &req); errMsg != "" {
+		HTTPError(w, http.StatusBadRequest, errMsg)
 		return
 	}
-	defer r.Body.Close()
 
 	job := model.Job{
 		Name:           req.Name,
@@ -63,14 +61,12 @@ func (s *server) GetJob(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) SubmitJobResult(w http.ResponseWriter, r *http.Request) {
-	jobId := r.PathValue("jobsId")
+	jobId := r.PathValue("jobId")
 	var req model.SubmitJobResultRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		HTTPError(w, http.StatusBadRequest, "invalid request body")
+	if errMsg := decodeAndValidateRequest(r, &req); errMsg != "" {
+		HTTPError(w, http.StatusBadRequest, errMsg)
 		return
 	}
-	defer r.Body.Close()
-
 	if err := s.st.CompleteJob(jobId, req.Status, req.Logs, req.Result, req.Error); err != nil {
 		HTTPError(w, http.StatusInternalServerError, err.Error())
 		return

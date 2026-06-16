@@ -28,10 +28,10 @@ func (s *server) Routes() http.Handler {
 	mux.HandleFunc("POST /jobs/{jobId}/result", s.SubmitJobResult) // submit job results
 
 	// Agents
-	mux.HandleFunc("POST /agents/register", s.RegisterAgent)            // register
-	mux.HandleFunc("PUT /agents/{agentId}/heartbeat", s.AgentHeartbeat) // heartbeat
-	mux.HandleFunc("GET /agents/{agentId}/next-job", s.AssignNextJob)   // assign next job
-	mux.HandleFunc("GET /agents", s.ListAgents)                         // list agents
+	mux.HandleFunc("POST /agents/register", s.RegisterAgent)             // register
+	mux.HandleFunc("POST /agents/{agentId}/heartbeat", s.AgentHeartbeat) // heartbeat
+	mux.HandleFunc("POST /agents/{agentId}/next-job", s.AssignNextJob)   // assign next job
+	mux.HandleFunc("GET /agents", s.ListAgents)                          // list agents
 
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

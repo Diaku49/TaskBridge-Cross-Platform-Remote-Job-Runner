@@ -70,3 +70,11 @@ func (e *TcpCheckExecutor) Execute(ctx context.Context, job model.Job) Result {
 		},
 	}
 }
+
+func CheckTCPPayload(p *TCPCheckPayload) error {
+	if p.Address == "" {
+		return fmt.Errorf("address is required")
+	}
+
+	return nil
+}

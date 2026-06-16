@@ -1,0 +1,7 @@
+{
+  "status": "FAILED",
+  "logs": [
+    "job failed manually"
+  ],
+  "error": "manual failure example"
+}

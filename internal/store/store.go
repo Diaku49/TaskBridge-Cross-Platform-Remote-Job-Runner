@@ -83,7 +83,7 @@ func (ms *MemoryStore) GetJob(jobId string) (model.Job, bool, error) {
 
 	job, ok := ms.jobs[jobId]
 	if !ok {
-		return model.Job{}, false, fmt.Errorf("job not found")
+		return model.Job{}, false, nil
 	}
 
 	return job, ok, nil
@@ -129,6 +129,9 @@ func (ms *MemoryStore) CompleteJob(jobID string, status model.JobStatus, logs []
 		return fmt.Errorf("invalid completion status: %s", status)
 	}
 
+	job.Logs = logs
+	job.Result = result
+	job.Error = errMsg
 	ms.jobs[jobID] = job
 
 	return nil

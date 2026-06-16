@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 	"taskbridge/internal/model"
 	"time"
@@ -11,12 +10,10 @@ var LastSeenThreshold = 30 * time.Second
 
 func (s *server) RegisterAgent(w http.ResponseWriter, r *http.Request) {
 	var req model.RegisterAgentRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		HTTPError(w, http.StatusBadRequest, "invalid request body")
+	if errMsg := decodeAndValidateRequest(r, &req); errMsg != "" {
+		HTTPError(w, http.StatusBadRequest, errMsg)
 		return
 	}
-	defer r.Body.Close()
-
 	agent := model.Agent{
 		ID:           req.ID,
 		Hostname:     req.Hostname,

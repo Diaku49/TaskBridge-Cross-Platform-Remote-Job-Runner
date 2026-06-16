@@ -1,0 +1,9 @@
+{
+  "status": "SUCCESS",
+  "logs": [
+    "job completed manually"
+  ],
+  "result": {
+    "demo": true
+  }
+}

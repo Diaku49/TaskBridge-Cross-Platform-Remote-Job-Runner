@@ -1,0 +1,10 @@
+{
+  "name": "checksum-demo-input-file",
+  "type": "checksum",
+  "payload": {
+    "path": "/tmp/taskbridge-demo/input.txt",
+    "algorithm": "sha256"
+  },
+  "timeout_seconds": 10,
+  "max_retries": 0
+}
