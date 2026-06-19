@@ -1,6 +1,7 @@
 const runtimeConfig = window.__TASKBRIDGE_CONFIG__ || {};
 const defaultAPIBase = runtimeConfig.apiBase || "http://localhost:8080";
 const defaultJobTargetBase = (runtimeConfig.jobTargetBase || defaultAPIBase).replace(/\/$/, "");
+const autoRefreshIntervalMs = 2000;
 
 const state = {
   apiBase: defaultAPIBase,
@@ -10,6 +11,7 @@ const state = {
   selectedKind: null,
   selectedId: null,
   toastTimer: null,
+  isRefreshing: false,
 };
 
 const payloadTemplates = {
@@ -122,8 +124,16 @@ async function sendJSON(path, payload) {
   return data;
 }
 
-async function refreshAll() {
-  setLoading(true);
+async function refreshAll({ silent = false } = {}) {
+  if (state.isRefreshing) {
+    return;
+  }
+
+  state.isRefreshing = true;
+  if (!silent) {
+    setLoading(true);
+  }
+
   try {
     const [health, jobs, agents] = await Promise.all([
       fetchJSON("/health"),
@@ -137,10 +147,25 @@ async function refreshAll() {
     render();
   } catch (error) {
     setHealth(false, error.message);
-    showToast(error.message);
+    if (!silent) {
+      showToast(error.message);
+    }
   } finally {
-    setLoading(false);
+    if (!silent) {
+      setLoading(false);
+    }
+    state.isRefreshing = false;
   }
+}
+
+function startAutoRefresh() {
+  window.setInterval(() => {
+    if (document.hidden) {
+      return;
+    }
+
+    refreshAll({ silent: true });
+  }, autoRefreshIntervalMs);
 }
 
 async function createJob() {
@@ -492,7 +517,7 @@ function showToast(message) {
   }, 3200);
 }
 
-els.refreshButton.addEventListener("click", refreshAll);
+els.refreshButton.addEventListener("click", () => refreshAll());
 
 els.apiBaseInput.addEventListener("change", () => {
   state.apiBase = els.apiBaseInput.value.trim() || defaultAPIBase;
@@ -541,4 +566,5 @@ els.jobLookupForm.addEventListener("submit", (event) => {
 
 setPayloadTemplate(els.createJobType.value, true);
 els.apiBaseInput.value = state.apiBase;
+startAutoRefresh();
 refreshAll();
