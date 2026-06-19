@@ -12,6 +12,8 @@ Use this shell variable to keep commands shorter:
 SERVER=http://localhost:8080
 ```
 
+If the agent is running inside Docker Compose, job payload URLs should use Compose service names, such as `http://api-memory:8080/health`, because the agent executes the job from inside the Docker network.
+
 ## Health
 
 ```bash

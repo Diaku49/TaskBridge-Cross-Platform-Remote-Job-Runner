@@ -71,7 +71,6 @@ func (ac *AgentClient) Register() error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	// Registration
 	resp, err := ac.HTTPClient.Do(req)
 	if err != nil {
 		return fmt.Errorf(" failed to send register request: %w", err)
@@ -120,7 +119,6 @@ func (ac *AgentClient) Start(ctx context.Context) {
 }
 
 func (ac *AgentClient) ExecuteJob(job model.Job, ctx context.Context) {
-	// find Job
 	executor, found := ac.ExecutorRegistry.Get(job.Type)
 	if !found {
 		result := e.Result{
@@ -139,7 +137,6 @@ func (ac *AgentClient) ExecuteJob(job model.Job, ctx context.Context) {
 		return
 	}
 
-	// Checking timeout
 	jobCtx := ctx
 	var cancel context.CancelFunc
 	if job.TimeoutSeconds > 0 {

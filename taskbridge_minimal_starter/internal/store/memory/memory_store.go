@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// TODO: Candidate should implement MemoryStore with mutex-safe maps.
 type MemoryStore struct {
 	mu                sync.RWMutex
 	agents            map[string]model.Agent

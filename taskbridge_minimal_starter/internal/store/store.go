@@ -4,8 +4,6 @@ import (
 	"taskbridge/internal/model"
 )
 
-// Store defines the required persistence operations.
-// Candidate should first implement an in-memory store, then optionally add SQLite.
 type Store interface {
 	CreateJob(job model.Job) (model.Job, error)
 	ListJobs() ([]model.Job, error)

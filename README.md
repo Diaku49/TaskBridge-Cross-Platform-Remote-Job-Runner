@@ -1,8 +1,8 @@
 # TaskBridge
 
-TaskBridge is a small remote job runner written in Go. It has an HTTP server that stores and assigns jobs, and an agent process that registers itself, polls for compatible work, executes jobs, sends heartbeats, and reports results back to the server.
+TaskBridge is a small remote job runner written in Go. It has an HTTP API server that stores and assigns jobs, and an agent process that registers itself, polls for compatible work, executes jobs, sends heartbeats, and reports results back to the server.
 
-I built it in the same order I would normally grow a service like this: first the server and job API, then agents and assignment, then the in-memory store required by the assignment, then executors and result handling. After that I added a SQLite store behind the same store interface, a simple dashboard, and Docker profiles for both memory and SQLite runs.
+The project was built in stages: server and job API first, then agents and assignment, then the required in-memory store, executors, result handling, optional SQLite persistence, a small dashboard, and Docker profiles for both storage modes.
 
 ## What Is Included
 
@@ -10,22 +10,17 @@ I built it in the same order I would normally grow a service like this: first th
 - Go agent in `taskbridge_minimal_starter/cmd/agent`
 - In-memory store used by default
 - Optional SQLite store using `modernc.org/sqlite` and sqlc-generated queries
-- Executors for:
-  - `http_check`
-  - `tcp_check`
-  - `file_exists`
-  - `checksum`
-  - `write_file`
-  - `wait`
+- Executors for `http_check`, `tcp_check`, `file_exists`, `checksum`, `write_file`, and `wait`
 - Static dashboard in `frontend`
 - Docker Compose profiles for memory and SQLite modes
-- Example JSON payloads and curl commands
+- API examples in `taskbridge_minimal_starter/docs/API_EXAMPLES.md`
 
 ## Project Layout
 
 ```text
 .
 ├── docker-compose.yml
+├── DOCKER.md
 ├── frontend/
 │   ├── index.html
 │   ├── app.js
@@ -35,19 +30,19 @@ I built it in the same order I would normally grow a service like this: first th
     ├── cmd/
     │   ├── agent/
     │   └── server/
-    ├── internal/
-    │   ├── agent/
-    │   ├── api/
-    │   ├── executor/
-    │   ├── model/
-    │   └── store/
+    ├── docs/
     ├── examples/
-    └── docs/
+    └── internal/
+        ├── agent/
+        ├── api/
+        ├── executor/
+        ├── model/
+        └── store/
 ```
 
 ## Run Locally
 
-Start the server with the default in-memory store:
+Start the API server with the default in-memory store:
 
 ```bash
 cd taskbridge_minimal_starter
@@ -79,11 +74,9 @@ List jobs:
 curl -sS http://localhost:8080/jobs
 ```
 
-More API examples are in `taskbridge_minimal_starter/docs/API_EXAMPLES.md`.
-
 ## SQLite Mode
 
-The server can use SQLite instead of memory:
+SQLite uses the same API and store interface as memory mode:
 
 ```bash
 cd taskbridge_minimal_starter
@@ -93,7 +86,7 @@ go run ./cmd/server \
   --sqlite-path taskbridge.db
 ```
 
-The SQLite store initializes its schema on startup. It uses the same API and store interface as memory mode.
+The schema is initialized automatically when the SQLite store starts.
 
 ## Dashboard
 
@@ -104,17 +97,19 @@ cd frontend
 npm run dev
 ```
 
-Open:
+Open `http://127.0.0.1:5173`.
 
-```text
-http://127.0.0.1:5173
+The dashboard shows jobs, agents, status counts, job details, and a create-job form. It calls the backend API directly, so the Go server's CORS middleware allows browser requests from the dashboard port.
+
+Set `TASKBRIDGE_API` if the API is running somewhere else:
+
+```bash
+TASKBRIDGE_API=http://localhost:8081 npm run dev
 ```
-
-The dashboard shows jobs, agents, status counts, and a job lookup panel. By default it proxies `/api` to `http://localhost:8080`.
 
 ## Docker
 
-Run the assignment-style memory stack:
+Run the in-memory stack:
 
 ```bash
 docker compose --profile memory up --build
@@ -133,15 +128,19 @@ docker compose --profile sqlite up --build
 - Dashboard: `http://localhost:5174`
 - SQLite data volume: `taskbridge_taskbridge-sqlite-data`
 
+When creating `http_check` jobs from the Docker dashboard, the generated payload targets the API service name such as `http://api-memory:8080/health`. That address is reachable from the agent container. From local, non-Docker runs, `http://localhost:8080/health` is fine.
+
 Reset the SQLite database:
 
 ```bash
 docker compose --profile sqlite down -v
 ```
 
-## Tests
+More Docker notes are in `DOCKER.md`.
 
-Run the Go checks:
+## Checks
+
+Run the Go package checks:
 
 ```bash
 cd taskbridge_minimal_starter
@@ -155,9 +154,9 @@ docker compose --profile memory config
 docker compose --profile sqlite config
 ```
 
-## Notes
+## Current Scope
 
-- The memory store is the default path and the core assignment implementation.
-- SQLite is optional and selected with `--store sqlite`.
-- The dashboard is intentionally small: it is for observing jobs and agents rather than managing every action.
-- Job cancellation is still a stretch-goal area; the route is not wired into the server yet.
+- Memory mode is the main assignment path.
+- SQLite mode is optional and selected with `--store sqlite`.
+- The dashboard is intentionally small: it is for observing agents/jobs and creating simple jobs.
+- Job cancellation is not wired into the server routes.

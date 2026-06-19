@@ -47,11 +47,3 @@ func DecodePayload(payload map[string]any, dst any) error {
 
 	return json.Unmarshal(jsonByte, dst)
 }
-
-// TODO: Candidate should implement safe executors:
-//   http_check
-//   tcp_check
-//   file_exists
-//   checksum
-//   write_file
-//   wait

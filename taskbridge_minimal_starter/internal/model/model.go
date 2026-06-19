@@ -63,9 +63,6 @@ var (
 	AgentOfflineAfter = 30 * time.Second
 )
 
-// TODO: Candidate should define request/response DTOs clearly.
-
-// Job DTOs
 type CreateJobRequest struct {
 	Name           string         `json:"name" validate:"required,notblank"`
 	Type           JobType        `json:"type" validate:"required,oneof=http_check tcp_check file_exists checksum write_file wait"`
@@ -81,7 +78,6 @@ type SubmitJobResultRequest struct {
 	Error  string         `json:"error,omitempty"`
 }
 
-// Agent DTOs
 type RegisterAgentRequest struct {
 	ID           string    `json:"id" validate:"required,notblank"`
 	Hostname     string    `json:"hostname" validate:"required,notblank"`
@@ -91,17 +87,9 @@ type RegisterAgentRequest struct {
 	Capabilities []JobType `json:"capabilities" validate:"required,min=1,dive,oneof=http_check tcp_check file_exists checksum write_file wait"`
 }
 
-// Not sure
 type ErrorResponse struct {
 	Message string `json:"message"`
 }
 type NextJobResponse struct {
 	Job Job `json:"job"`
 }
-
-// Suggested DTOs:
-//   CreateJobRequest
-//   RegisterAgentRequest
-//   JobResultRequest
-//   ErrorResponse
-//   NextJobResponse
