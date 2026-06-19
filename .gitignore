@@ -1,5 +1,10 @@
-/bin/
-*.exe
-*.test
-*.out
 .DS_Store
+*.db
+*.sqlite
+*.sqlite3
+
+taskbridge_minimal_starter/bin/
+taskbridge_minimal_starter/*.exe
+taskbridge_minimal_starter/*.test
+taskbridge_minimal_starter/*.out
+frontend/node_modules/

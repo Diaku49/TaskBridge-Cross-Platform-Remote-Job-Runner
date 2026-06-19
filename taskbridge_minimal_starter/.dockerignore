@@ -1,0 +1,7 @@
+.git
+.agents
+.codex
+*.db
+*.sqlite
+tmp/
+bin/

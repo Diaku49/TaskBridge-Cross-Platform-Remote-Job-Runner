@@ -1,0 +1,108 @@
+name: taskbridge
+
+services:
+  api-memory:
+    profiles: ["memory"]
+    build:
+      context: ./taskbridge_minimal_starter
+      dockerfile: Dockerfile
+    command: ["taskbridge-server", "--addr", ":8080", "--store", "memory"]
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  agent-memory:
+    profiles: ["memory"]
+    build:
+      context: ./taskbridge_minimal_starter
+      dockerfile: Dockerfile
+    command:
+      - taskbridge-agent
+      - --server
+      - http://api-memory:8080
+      - --id
+      - agent-memory-1
+      - --capabilities
+      - http_check,tcp_check,file_exists,checksum,write_file,wait
+    depends_on:
+      api-memory:
+        condition: service_healthy
+
+  dashboard-memory:
+    profiles: ["memory"]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      HOST: 0.0.0.0
+      PORT: 5173
+      TASKBRIDGE_API: http://localhost:8080
+      TASKBRIDGE_JOB_TARGET: http://api-memory:8080
+    ports:
+      - "5173:5173"
+    depends_on:
+      api-memory:
+        condition: service_healthy
+
+  api-sqlite:
+    profiles: ["sqlite"]
+    build:
+      context: ./taskbridge_minimal_starter
+      dockerfile: Dockerfile
+    command:
+      - taskbridge-server
+      - --addr
+      - :8080
+      - --store
+      - sqlite
+      - --sqlite-path
+      - /data/taskbridge.db
+    ports:
+      - "8081:8080"
+    volumes:
+      - taskbridge-sqlite-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  agent-sqlite:
+    profiles: ["sqlite"]
+    build:
+      context: ./taskbridge_minimal_starter
+      dockerfile: Dockerfile
+    command:
+      - taskbridge-agent
+      - --server
+      - http://api-sqlite:8080
+      - --id
+      - agent-sqlite-1
+      - --capabilities
+      - http_check,tcp_check,file_exists,checksum,write_file,wait
+    depends_on:
+      api-sqlite:
+        condition: service_healthy
+
+  dashboard-sqlite:
+    profiles: ["sqlite"]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      HOST: 0.0.0.0
+      PORT: 5173
+      TASKBRIDGE_API: http://localhost:8081
+      TASKBRIDGE_JOB_TARGET: http://api-sqlite:8080
+    ports:
+      - "5174:5173"
+    depends_on:
+      api-sqlite:
+        condition: service_healthy
+
+volumes:
+  taskbridge-sqlite-data:

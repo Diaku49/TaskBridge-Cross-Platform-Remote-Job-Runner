@@ -50,7 +50,7 @@ func (s *server) AssignNextJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !exist {
-		HTTPError(w, http.StatusNoContent, "Assignable job not found")
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 

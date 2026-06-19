@@ -91,6 +91,8 @@ func (ac *AgentClient) Register() error {
 }
 
 func (ac *AgentClient) Start(ctx context.Context) {
+	fmt.Printf("agent with %q is running\n", ac.Agent.ID)
+
 	go HeartbeatLoop(ac, ctx)
 
 	ticker := time.NewTicker(ac.PollInterval)
@@ -108,10 +110,10 @@ func (ac *AgentClient) Start(ctx context.Context) {
 				continue
 			}
 			if !hasJob {
-				fmt.Println("No job available, will poll again...")
 				continue
 			}
 
+			fmt.Printf("agent with %q accepted job %q\n", ac.Agent.ID, job.ID)
 			ac.ExecuteJob(job, ctx)
 		}
 	}
@@ -130,8 +132,10 @@ func (ac *AgentClient) ExecuteJob(job model.Job, ctx context.Context) {
 
 		if err := ac.SubmitJobResult(job.ID, result); err != nil {
 			fmt.Printf("Failed to submit unsupported-job result: %v\n", err)
+			return
 		}
 
+		fmt.Printf("job %q finished with status %q\n", job.ID, result.Status)
 		return
 	}
 
@@ -147,7 +151,10 @@ func (ac *AgentClient) ExecuteJob(job model.Job, ctx context.Context) {
 
 	if err := ac.SubmitJobResult(job.ID, result); err != nil {
 		fmt.Printf("Failed to submit job result: %v\n", err)
+		return
 	}
+
+	fmt.Printf("job %q finished with status %q\n", job.ID, result.Status)
 }
 
 func (ac *AgentClient) SubmitJobResult(jobId string, result e.Result) error {
